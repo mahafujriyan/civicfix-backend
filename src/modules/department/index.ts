@@ -1,2 +1,4 @@
-// Department module — implemented in Phase 4
-export {};
+import departmentRoutes from './department.routes';
+
+export { departmentRoutes };
+export * from './department.validation';

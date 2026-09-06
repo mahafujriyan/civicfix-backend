@@ -1,2 +1,4 @@
-// Complaint module — implemented in Phase 4/5
-export {};
+import complaintRoutes from './complaint.routes';
+
+export { complaintRoutes };
+export * from './complaint.validation';
