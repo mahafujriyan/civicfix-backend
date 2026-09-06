@@ -1,2 +1,4 @@
-// Auth module — implemented in Phase 3
-export {};
+import authRoutes from './auth.routes';
+
+export { authRoutes };
+export * from './auth.validation';
