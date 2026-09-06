@@ -92,20 +92,19 @@ Required:
 
 - `DATABASE_URL`
 - `JWT_SECRET`
-- `REDIS_URL` (local: `redis://localhost:6379`)
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
 - Stripe / Google keys when testing those flows
 
-### 2.1 Start Redis (required for caching + rate limiting)
+### 2.1 Redis (Upstash REST)
 
-```bash
-docker compose up -d redis
-```
+This project uses **Upstash Redis REST API** (not local `redis://` TCP).
 
-Verify:
+Set in `.env`:
 
-```bash
-docker exec civicfix-redis redis-cli ping
-# PONG
+```env
+UPSTASH_REDIS_REST_URL=https://YOUR_ENDPOINT.upstash.io
+UPSTASH_REDIS_REST_TOKEN=YOUR_UPSTASH_REST_TOKEN
 ```
 
 Health check should show `"redis": "ok"` at `/api/v1/health`.

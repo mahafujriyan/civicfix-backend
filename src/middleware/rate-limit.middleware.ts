@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { getRedis, isRedisAvailable } from '../lib/redis';
+import { isRedisAvailable, rateLimitIncr } from '../lib/redis';
 import { ApiError } from '../utils/api-error';
 
 interface RateLimitOptions {
@@ -17,12 +17,8 @@ export function rateLimit({ windowMs, max, keyPrefix }: RateLimitOptions) {
       const key = `${keyPrefix}:${identifier}`;
 
       if (isRedisAvailable()) {
-        const redis = getRedis();
-        if (redis) {
-          const count = await redis.incr(key);
-          if (count === 1) {
-            await redis.pexpire(key, windowMs);
-          }
+        const count = await rateLimitIncr(key, windowMs);
+        if (count !== null) {
           res.setHeader('X-RateLimit-Limit', String(max));
           res.setHeader('X-RateLimit-Remaining', String(Math.max(0, max - count)));
           if (count > max) {
