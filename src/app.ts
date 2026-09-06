@@ -5,6 +5,7 @@ import { env } from './config/env';
 import routes from './routes';
 import { errorMiddleware } from './middleware/error.middleware';
 import { notFoundMiddleware } from './middleware/not-found.middleware';
+import { requestIdMiddleware } from './middleware/request-id.middleware';
 import { setupSwagger } from './docs/swagger';
 
 export function createApp(): Application {
@@ -12,6 +13,7 @@ export function createApp(): Application {
 
   app.set('trust proxy', 1);
 
+  app.use(requestIdMiddleware);
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(
     cors({
