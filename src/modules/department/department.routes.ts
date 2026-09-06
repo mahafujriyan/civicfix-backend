@@ -13,10 +13,7 @@ import {
 const router = Router();
 
 router.get('/', validate(departmentListQuerySchema, 'query'), departmentController.list);
-router.get('/active/list', asyncHandler(async (_req, res) => {
-  const data = await departmentService.getActiveDepartmentsCached();
-  sendSuccess({ res, message: 'Active departments retrieved successfully', data });
-}));
+router.get('/active/list', departmentController.listActive);
 router.get('/:id', departmentController.getById);
 
 router.post(
@@ -35,11 +32,6 @@ router.patch(
   departmentController.update,
 );
 
-router.delete(
-  '/:id',
-  authenticate,
-  authorize(Role.ADMIN),
-  departmentController.remove,
-);
+router.delete('/:id', authenticate, authorize(Role.ADMIN), departmentController.remove);
 
 export default router;

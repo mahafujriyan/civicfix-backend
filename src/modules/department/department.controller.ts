@@ -32,6 +32,15 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+export const listActive = asyncHandler(async (_req: Request, res: Response) => {
+  const data = await departmentService.getActiveDepartmentsCached();
+  sendSuccess({
+    res,
+    message: 'Active departments retrieved successfully',
+    data,
+  });
+});
+
 export const getById = asyncHandler(async (req: Request, res: Response) => {
   const department = await departmentService.getDepartmentById(req.params.id as string);
   sendSuccess({
