@@ -1,4 +1,4 @@
-import { ComplaintStatus, Priority } from '@prisma/client';
+import { ComplaintStatus, PaymentStatus, Priority, Role } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
 import { getRedis, isRedisAvailable } from '../../lib/redis';
 
@@ -43,10 +43,10 @@ export async function getOverview() {
     prisma.complaint.count({ where: { status: ComplaintStatus.RESOLVED } }),
     prisma.complaint.count({ where: { status: ComplaintStatus.CLOSED } }),
     prisma.user.count(),
-    prisma.user.count({ where: { role: 'STAFF' } }),
-    prisma.user.count({ where: { role: 'CITIZEN' } }),
-    prisma.payment.count({ where: { status: 'PAID' } }),
-    prisma.payment.count({ where: { status: 'PENDING' } }),
+    prisma.user.count({ where: { role: Role.STAFF } }),
+    prisma.user.count({ where: { role: Role.CITIZEN } }),
+    prisma.payment.count({ where: { status: PaymentStatus.PAID } }),
+    prisma.payment.count({ where: { status: PaymentStatus.PENDING } }),
   ]);
 
   const data = {
