@@ -249,32 +249,67 @@ npm run prisma:seed
 
 ---
 
-## Deployment (Render)
+## Deployment (Vercel)
 
-1. Create a PostgreSQL database on Render (or Neon/Supabase)
-2. Optional: Redis add-on / Upstash
-3. Create a Web Service from this repo (`render.yaml` included)
-4. Set environment variables from `.env.example`
-5. Deploy
-6. Point Stripe webhook to `https://<your-api>/api/v1/payments/webhook`
+This API is configured for **Vercel serverless** (`api/index.ts` + `vercel.json`).
 
-Build:
+### 1. Install Vercel CLI
 
 ```bash
-npm install && npx prisma generate && npm run build
+npm i -g vercel
 ```
 
-Start:
+### 2. Login & link project
 
 ```bash
-npx prisma migrate deploy && npm start
+vercel login
+vercel link
 ```
 
-After first deploy, run seed once (Render shell or one-off job):
+### 3. Add environment variables in Vercel Dashboard (or CLI)
+
+Required:
+
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `JWT_EXPIRES_IN`
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+- `CORS_ORIGIN` (use `*` or your frontend URL)
+- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` (if using Google login)
+- `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_SUCCESS_URL` / `STRIPE_CANCEL_URL` (your Vercel URL)
+
+### 4. Run migrations against Neon (once)
 
 ```bash
+npx prisma migrate deploy
 npm run prisma:seed
 ```
+
+### 5. Deploy
+
+```bash
+vercel          # preview
+vercel --prod   # production
+```
+
+After deploy:
+
+- Health: `https://<your-app>.vercel.app/api/v1/health`
+- Docs: `https://<your-app>.vercel.app/api/docs`
+
+### Stripe webhook
+
+Point Stripe webhook to:
+
+`https://<your-app>.vercel.app/api/v1/payments/webhook`
+
+---
+
+## Deployment (Render)
+
+Alternative PaaS option (`render.yaml` included).
 
 ---
 

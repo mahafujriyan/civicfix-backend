@@ -9,6 +9,7 @@ export function setupSwagger(app: Application): void {
     path.join(__dirname, 'openapi.yaml'),
     path.join(process.cwd(), 'src/docs/openapi.yaml'),
     path.join(process.cwd(), 'dist/docs/openapi.yaml'),
+    path.join(process.cwd(), 'openapi.yaml'),
   ];
 
   const openapiPath = candidates.find((candidate) => fs.existsSync(candidate));

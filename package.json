@@ -22,6 +22,8 @@
     "redis:logs": "docker compose logs -f redis",
     "test": "vitest run",
     "test:watch": "vitest",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel",
     "postinstall": "prisma generate"
   },
   "keywords": [
@@ -40,7 +42,7 @@
   "dependencies": {
     "@prisma/client": "^6.19.0",
     "@upstash/redis": "^1.38.4",
-    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -54,13 +56,14 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.4.1",
     "@types/supertest": "^7.2.1",
     "@types/swagger-ui-express": "^4.1.8",
+    "@vercel/node": "^12.0.1",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.6",
