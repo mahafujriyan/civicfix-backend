@@ -1,5 +1,5 @@
 import { prisma } from '../../lib/prisma';
-import { getRedis, isRedisAvailable } from '../../lib/redis';
+import { cacheDel, cacheGet, cacheSet } from '../../lib/redis';
 import { ApiError } from '../../utils/api-error';
 import { getPaginationMeta, getSkipTake } from '../../utils/pagination';
 import {
@@ -12,11 +12,7 @@ const CACHE_KEY = 'cache:categories:active';
 const CACHE_TTL_SECONDS = 300;
 
 async function invalidateCategoryCache() {
-  if (!isRedisAvailable()) return;
-  const redis = getRedis();
-  if (redis) {
-    await redis.del(CACHE_KEY).catch(() => undefined);
-  }
+  await cacheDel(CACHE_KEY);
 }
 
 async function assertDepartmentExists(departmentId?: string | null) {
@@ -84,14 +80,9 @@ export async function listCategories(query: CategoryListQuery) {
 }
 
 export async function getActiveCategoriesCached() {
-  if (isRedisAvailable()) {
-    const redis = getRedis();
-    if (redis) {
-      const cached = await redis.get(CACHE_KEY).catch(() => null);
-      if (cached) {
-        return JSON.parse(cached) as unknown;
-      }
-    }
+  const cached = await cacheGet<unknown[]>(CACHE_KEY);
+  if (cached) {
+    return cached;
   }
 
   const categories = await prisma.category.findMany({
@@ -100,15 +91,7 @@ export async function getActiveCategoriesCached() {
     include: { department: { select: { id: true, name: true } } },
   });
 
-  if (isRedisAvailable()) {
-    const redis = getRedis();
-    if (redis) {
-      await redis.set(CACHE_KEY, JSON.stringify(categories), 'EX', CACHE_TTL_SECONDS).catch(
-        () => undefined,
-      );
-    }
-  }
-
+  await cacheSet(CACHE_KEY, categories, CACHE_TTL_SECONDS);
   return categories;
 }
 

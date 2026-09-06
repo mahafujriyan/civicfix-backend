@@ -1,19 +1,14 @@
 import { ComplaintStatus, PaymentStatus, Priority, Role } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
-import { getRedis, isRedisAvailable } from '../../lib/redis';
+import { cacheGet, cacheSet } from '../../lib/redis';
 
 const OVERVIEW_CACHE_KEY = 'cache:analytics:overview';
 const CACHE_TTL_SECONDS = 60;
 
 export async function getOverview() {
-  if (isRedisAvailable()) {
-    const redis = getRedis();
-    if (redis) {
-      const cached = await redis.get(OVERVIEW_CACHE_KEY).catch(() => null);
-      if (cached) {
-        return JSON.parse(cached) as unknown;
-      }
-    }
+  const cached = await cacheGet<Record<string, unknown>>(OVERVIEW_CACHE_KEY);
+  if (cached) {
+    return cached;
   }
 
   const [
@@ -67,15 +62,7 @@ export async function getOverview() {
     },
   };
 
-  if (isRedisAvailable()) {
-    const redis = getRedis();
-    if (redis) {
-      await redis
-        .set(OVERVIEW_CACHE_KEY, JSON.stringify(data), 'EX', CACHE_TTL_SECONDS)
-        .catch(() => undefined);
-    }
-  }
-
+  await cacheSet(OVERVIEW_CACHE_KEY, data, CACHE_TTL_SECONDS);
   return data;
 }
 

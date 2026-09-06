@@ -17,6 +17,9 @@
     "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "tsx prisma/seed.ts",
     "prisma:studio": "prisma studio",
+    "redis:up": "docker compose up -d redis",
+    "redis:down": "docker compose stop redis",
+    "redis:logs": "docker compose logs -f redis",
     "test": "vitest run",
     "test:watch": "vitest",
     "postinstall": "prisma generate"

@@ -92,8 +92,23 @@ Required:
 
 - `DATABASE_URL`
 - `JWT_SECRET`
-- `REDIS_URL` (optional locally; API continues without Redis)
+- `REDIS_URL` (local: `redis://localhost:6379`)
 - Stripe / Google keys when testing those flows
+
+### 2.1 Start Redis (required for caching + rate limiting)
+
+```bash
+docker compose up -d redis
+```
+
+Verify:
+
+```bash
+docker exec civicfix-redis redis-cli ping
+# PONG
+```
+
+Health check should show `"redis": "ok"` at `/api/v1/health`.
 
 ### 3. Migrate & seed
 
