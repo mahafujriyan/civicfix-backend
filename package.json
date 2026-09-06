@@ -24,6 +24,7 @@
     "test:watch": "vitest",
     "deploy": "vercel --prod",
     "deploy:preview": "vercel",
+    "vercel-build": "prisma generate",
     "postinstall": "prisma generate"
   },
   "keywords": [
