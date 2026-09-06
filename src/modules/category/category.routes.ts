@@ -13,6 +13,7 @@ import {
 const router = Router();
 
 router.get('/', validate(categoryListQuerySchema, 'query'), categoryController.list);
+router.get('/active/list', categoryController.listActive);
 router.get('/:id', categoryController.getById);
 
 router.post(

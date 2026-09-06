@@ -30,6 +30,15 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+export const listActive = asyncHandler(async (_req: Request, res: Response) => {
+  const data = await categoryService.getActiveCategoriesCached();
+  sendSuccess({
+    res,
+    message: 'Active categories retrieved successfully',
+    data,
+  });
+});
+
 export const getById = asyncHandler(async (req: Request, res: Response) => {
   const category = await categoryService.getCategoryById(req.params.id as string);
   sendSuccess({
