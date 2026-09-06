@@ -1,2 +1,3 @@
-// Notification module — implemented in Phase 5
-export {};
+import notificationRoutes from './notification.routes';
+
+export { notificationRoutes };

@@ -7,6 +7,7 @@ import { categoryRoutes } from '../modules/category';
 import { complaintRoutes } from '../modules/complaint';
 import { paymentRoutes } from '../modules/payment';
 import { analyticsRoutes } from '../modules/analytics';
+import { notificationRoutes } from '../modules/notification';
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use('/categories', categoryRoutes);
 router.use('/complaints', complaintRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/analytics', analyticsRoutes);
+router.use('/notifications', notificationRoutes);
 
 export default router;
