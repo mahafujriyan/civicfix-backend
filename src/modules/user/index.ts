@@ -1,2 +1,4 @@
-// User module — implemented in Phase 3/4
-export {};
+import userRoutes from './user.routes';
+
+export { userRoutes };
+export * from './user.validation';
