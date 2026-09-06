@@ -1,20 +1,14 @@
-import { AuthProvider, Role, User } from '@prisma/client';
+import { AuthProvider, Role } from '@prisma/client';
 import { OAuth2Client } from 'google-auth-library';
 import { prisma } from '../../lib/prisma';
 import { env } from '../../config/env';
 import { ApiError } from '../../utils/api-error';
 import { hashPassword, comparePassword } from '../../utils/password';
 import { signAccessToken } from '../../utils/jwt';
+import { omitPassword } from '../../utils/user.serializer';
 import { GoogleAuthInput, LoginInput, RegisterInput } from './auth.validation';
 
 const googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID);
-
-type SafeUser = Omit<User, 'passwordHash'>;
-
-function sanitizeUser(user: User): SafeUser {
-  const { passwordHash: _passwordHash, ...safe } = user;
-  return safe;
-}
 
 async function writeAuditLog(actorId: string, action: string, entityId: string) {
   await prisma.auditLog.create({
@@ -54,7 +48,7 @@ export async function register(input: RegisterInput) {
   });
 
   return {
-    user: sanitizeUser(user),
+    user: omitPassword(user),
     accessToken,
   };
 }
@@ -86,7 +80,7 @@ export async function login(input: LoginInput) {
   });
 
   return {
-    user: sanitizeUser(user),
+    user: omitPassword(user),
     accessToken,
   };
 }
@@ -132,7 +126,7 @@ export async function loginWithGoogle(input: GoogleAuthInput) {
   if (!user) {
     user = await prisma.user.create({
       data: {
-        email: payloadEmail,
+        email: payloadEmail!,
         fullName,
         googleId,
         role: Role.CITIZEN,
@@ -159,7 +153,7 @@ export async function loginWithGoogle(input: GoogleAuthInput) {
   });
 
   return {
-    user: sanitizeUser(user),
+    user: omitPassword(user),
     accessToken,
   };
 }
@@ -178,6 +172,5 @@ export async function getMe(userId: string) {
     throw ApiError.notFound('User not found');
   }
 
-  const { passwordHash: _passwordHash, ...safe } = user;
-  return safe;
+  return omitPassword(user);
 }

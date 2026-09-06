@@ -1,12 +1,8 @@
 import { prisma } from '../../lib/prisma';
 import { ApiError } from '../../utils/api-error';
 import { getPaginationMeta, getSkipTake } from '../../utils/pagination';
+import { omitPassword } from '../../utils/user.serializer';
 import { UpdateProfileInput, UpdateUserStatusInput, UserListQuery } from './user.validation';
-
-function omitPassword<T extends { passwordHash?: string | null }>(user: T) {
-  const { passwordHash: _passwordHash, ...rest } = user;
-  return rest;
-}
 
 export async function getProfile(userId: string) {
   const user = await prisma.user.findUnique({
