@@ -1,2 +1,4 @@
-// Payment module — implemented in Phase 7
-export {};
+import paymentRoutes from './payment.routes';
+
+export { paymentRoutes };
+export * from './payment.validation';

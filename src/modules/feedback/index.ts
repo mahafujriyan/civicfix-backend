@@ -1,2 +1,4 @@
-// Feedback module — implemented in Phase 5
-export {};
+import feedbackRoutes from '../complaint/complaint.routes';
+
+// Feedback endpoints live under complaint workflow routes.
+export { feedbackRoutes };

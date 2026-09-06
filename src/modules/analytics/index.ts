@@ -1,2 +1,3 @@
-// Analytics module — implemented in Phase 6
-export {};
+import analyticsRoutes from './analytics.routes';
+
+export { analyticsRoutes };

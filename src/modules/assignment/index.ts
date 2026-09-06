@@ -1,2 +1,4 @@
-// Assignment module — implemented in Phase 5
-export {};
+import assignmentRoutes from '../complaint/complaint.routes';
+
+// Assignment endpoints live under complaint workflow routes.
+export { assignmentRoutes };
