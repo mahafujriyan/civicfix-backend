@@ -211,6 +211,13 @@ Collection variables:
 
 Suggested walkthrough order: Auth login scripts → Categories → Create complaint → Workflow → Feedback → Analytics.
 
+Assignable staff helper:
+
+```http
+GET /api/v1/assignments/staff
+Authorization: Bearer <adminToken>
+```
+
 ---
 
 ## Scripts
