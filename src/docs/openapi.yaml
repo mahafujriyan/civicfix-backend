@@ -1,0 +1,693 @@
+openapi: 3.0.3
+info:
+  title: CivicFix API
+  description: City Complaint & Service Request Platform
+  version: 1.0.0
+servers:
+  - url: /api/v1
+    description: API v1
+tags:
+  - name: Health
+  - name: Auth
+  - name: Users
+  - name: Departments
+  - name: Categories
+  - name: Complaints
+  - name: Workflow
+  - name: Feedback
+  - name: Payments
+  - name: Analytics
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+        data: {}
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+    RegisterRequest:
+      type: object
+      required: [email, password, fullName]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          example: Citizen@12345
+        fullName:
+          type: string
+        phone:
+          type: string
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    ComplaintCreateRequest:
+      type: object
+      required: [title, description, categoryId, location]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        categoryId:
+          type: string
+          format: uuid
+        priority:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, URGENT]
+        location:
+          type: object
+          required: [address, city]
+          properties:
+            address:
+              type: string
+            city:
+              type: string
+            area:
+              type: string
+            latitude:
+              type: number
+            longitude:
+              type: number
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      responses:
+        '200':
+          description: API is healthy
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register citizen
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Registered
+        '400':
+          description: Validation failed
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+        '401':
+          description: Invalid credentials
+  /auth/google:
+    post:
+      tags: [Auth]
+      summary: Login with Google ID token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [idToken]
+              properties:
+                idToken:
+                  type: string
+      responses:
+        '200':
+          description: Google login successful
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Current authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profile
+        '401':
+          description: Unauthorized
+  /users/me:
+    get:
+      tags: [Users]
+      summary: Get own profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profile
+    patch:
+      tags: [Users]
+      summary: Update own profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Updated
+  /users:
+    get:
+      tags: [Users]
+      summary: List users (ADMIN)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Users list
+        '403':
+          description: Forbidden
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Get user by id (ADMIN)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User
+  /users/{id}/status:
+    patch:
+      tags: [Users]
+      summary: Activate/deactivate user (ADMIN)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [isActive]
+              properties:
+                isActive:
+                  type: boolean
+      responses:
+        '200':
+          description: Status updated
+  /departments:
+    get:
+      tags: [Departments]
+      summary: List departments
+      responses:
+        '200':
+          description: Departments
+    post:
+      tags: [Departments]
+      summary: Create department (ADMIN)
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Created
+  /departments/{id}:
+    get:
+      tags: [Departments]
+      summary: Get department
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Department
+    patch:
+      tags: [Departments]
+      summary: Update department (ADMIN)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [Departments]
+      summary: Delete department (ADMIN)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Deleted
+  /categories:
+    get:
+      tags: [Categories]
+      summary: List categories
+      responses:
+        '200':
+          description: Categories
+    post:
+      tags: [Categories]
+      summary: Create category (ADMIN)
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Created
+  /categories/{id}:
+    get:
+      tags: [Categories]
+      summary: Get category
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Category
+    patch:
+      tags: [Categories]
+      summary: Update category (ADMIN)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [Categories]
+      summary: Delete category (ADMIN)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Deleted
+  /complaints:
+    get:
+      tags: [Complaints]
+      summary: List complaints (role-scoped)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: priority
+          schema:
+            type: string
+        - in: query
+          name: categoryId
+          schema:
+            type: string
+        - in: query
+          name: departmentId
+          schema:
+            type: string
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Complaints
+    post:
+      tags: [Complaints]
+      summary: Create complaint (CITIZEN)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplaintCreateRequest'
+      responses:
+        '201':
+          description: Created
+  /complaints/{id}:
+    get:
+      tags: [Complaints]
+      summary: Get complaint details
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Complaint
+    patch:
+      tags: [Complaints]
+      summary: Update complaint
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [Complaints]
+      summary: Delete complaint
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Deleted
+  /complaints/{id}/status:
+    patch:
+      tags: [Workflow]
+      summary: Update complaint status with transition rules
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum:
+                    [
+                      SUBMITTED,
+                      UNDER_REVIEW,
+                      ASSIGNED,
+                      IN_PROGRESS,
+                      RESOLVED,
+                      CLOSED,
+                      REJECTED,
+                      CANCELLED,
+                    ]
+                note:
+                  type: string
+      responses:
+        '200':
+          description: Status updated
+        '400':
+          description: Invalid transition
+  /complaints/{id}/assign:
+    post:
+      tags: [Workflow]
+      summary: Assign staff (ADMIN)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [staffId]
+              properties:
+                staffId:
+                  type: string
+                  format: uuid
+                departmentId:
+                  type: string
+                  format: uuid
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Assigned
+  /complaints/{id}/history:
+    get:
+      tags: [Workflow]
+      summary: Complaint status history
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: History
+  /complaints/{id}/comments:
+    get:
+      tags: [Workflow]
+      summary: List comments
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Comments
+    post:
+      tags: [Workflow]
+      summary: Add comment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '201':
+          description: Comment created
+  /complaints/{id}/feedback:
+    get:
+      tags: [Feedback]
+      summary: Get feedback
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Feedback
+    post:
+      tags: [Feedback]
+      summary: Submit feedback after resolution (CITIZEN)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rating]
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+      responses:
+        '201':
+          description: Feedback created
+  /payments/create-session:
+    post:
+      tags: [Payments]
+      summary: Create Stripe Checkout session
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount]
+              properties:
+                amount:
+                  type: integer
+                  description: Amount in smallest currency unit (e.g. cents)
+                currency:
+                  type: string
+                  example: usd
+                complaintId:
+                  type: string
+                  format: uuid
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Session created
+  /payments/{id}:
+    get:
+      tags: [Payments]
+      summary: Get payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Payment
+  /payments/webhook:
+    post:
+      tags: [Payments]
+      summary: Stripe webhook (signature verified)
+      responses:
+        '200':
+          description: Received
+  /analytics/overview:
+    get:
+      tags: [Analytics]
+      summary: Platform overview (ADMIN)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Overview stats
+  /analytics/complaints:
+    get:
+      tags: [Analytics]
+      summary: Complaint analytics (ADMIN)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Complaint analytics
