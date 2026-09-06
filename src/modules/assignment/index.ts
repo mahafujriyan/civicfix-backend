@@ -1,4 +1,4 @@
-import assignmentRoutes from '../complaint/complaint.routes';
+import assignmentRoutes from './assignment.routes';
 
-// Assignment endpoints live under complaint workflow routes.
 export { assignmentRoutes };
+export * from './assignment.service';

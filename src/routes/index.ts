@@ -8,6 +8,7 @@ import { complaintRoutes } from '../modules/complaint';
 import { paymentRoutes } from '../modules/payment';
 import { analyticsRoutes } from '../modules/analytics';
 import { notificationRoutes } from '../modules/notification';
+import { assignmentRoutes } from '../modules/assignment';
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use('/complaints', complaintRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/analytics', analyticsRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/assignments', assignmentRoutes);
 
 export default router;

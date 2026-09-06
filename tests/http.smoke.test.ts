@@ -26,4 +26,10 @@ describe('health endpoint', () => {
     expect(res.status).toBe(404);
     expect(res.body.success).toBe(false);
   });
+
+  it('includes x-request-id response header', async () => {
+    const app = createApp();
+    const res = await request(app).get('/api/v1/health');
+    expect(res.headers['x-request-id']).toBeTruthy();
+  });
 });
