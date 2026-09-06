@@ -256,7 +256,8 @@ export async function updateComplaintStatus(
       throw ApiError.forbidden('Citizens can only cancel their own complaints');
     }
     if (
-      ![ComplaintStatus.SUBMITTED, ComplaintStatus.UNDER_REVIEW].includes(complaint.status)
+      complaint.status !== ComplaintStatus.SUBMITTED &&
+      complaint.status !== ComplaintStatus.UNDER_REVIEW
     ) {
       throw ApiError.badRequest('Complaint can no longer be cancelled');
     }
@@ -341,9 +342,9 @@ export async function assignComplaint(
   const complaint = await getComplaintOrThrow(id);
 
   if (
-    [ComplaintStatus.CLOSED, ComplaintStatus.CANCELLED, ComplaintStatus.REJECTED].includes(
-      complaint.status,
-    )
+    complaint.status === ComplaintStatus.CLOSED ||
+    complaint.status === ComplaintStatus.CANCELLED ||
+    complaint.status === ComplaintStatus.REJECTED
   ) {
     throw ApiError.badRequest('Cannot assign a closed, cancelled, or rejected complaint');
   }
@@ -457,7 +458,8 @@ export async function addComment(actor: AuthActor, id: string, input: CommentCre
   }
 
   if (
-    [ComplaintStatus.CLOSED, ComplaintStatus.CANCELLED].includes(complaint.status) &&
+    (complaint.status === ComplaintStatus.CLOSED ||
+      complaint.status === ComplaintStatus.CANCELLED) &&
     actor.role === Role.CITIZEN
   ) {
     throw ApiError.badRequest('Cannot comment on closed or cancelled complaints');
