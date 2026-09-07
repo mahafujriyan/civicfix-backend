@@ -253,6 +253,15 @@ npm run prisma:seed
 
 This API is configured for **Vercel serverless** (`api/index.ts` + `vercel.json`).
 
+### 🚀 Live Production URLs
+
+| Endpoint | URL |
+|----------|-----|
+| Base API | `https://civicfix-backend-nine.vercel.app/api/v1` |
+| Health Check | `https://civicfix-backend-nine.vercel.app/api/v1/health` |
+| Swagger Docs | `https://civicfix-backend-nine.vercel.app/api/docs` |
+| Stripe Webhook | `https://civicfix-backend-nine.vercel.app/api/v1/payments/webhook` |
+
 ### 1. Install Vercel CLI
 
 ```bash
@@ -296,14 +305,14 @@ vercel --prod   # production
 
 After deploy:
 
-- Health: `https://<your-app>.vercel.app/api/v1/health`
-- Docs: `https://<your-app>.vercel.app/api/docs`
+- Health: `https://civicfix-backend-nine.vercel.app/api/v1/health`
+- Docs: `https://civicfix-backend-nine.vercel.app/api/docs`
 
 ### Stripe webhook
 
 Point Stripe webhook to:
 
-`https://<your-app>.vercel.app/api/v1/payments/webhook`
+`https://civicfix-backend-nine.vercel.app/api/v1/payments/webhook`
 
 ---
 

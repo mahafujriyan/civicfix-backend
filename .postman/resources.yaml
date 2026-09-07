@@ -1,0 +1,8 @@
+workspace:
+  id: 565fe0af-48b3-43db-98b3-1cf88e554473
+localResources:
+  specs:
+    - ../src/docs/openapi.yaml
+resourceNameMappings:
+  specs:
+    - ../postman/specs/CivicFix API.yaml: CivicFix API.yaml
